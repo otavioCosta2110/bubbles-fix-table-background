@@ -432,17 +432,18 @@ func (m *Model) renderRow(r int) string {
 			continue
 		}
 		style := lipgloss.NewStyle().Width(m.cols[i].Width).MaxWidth(m.cols[i].Width).Inline(true)
-		renderedCell := m.styles.Cell.Render(style.Render(runewidth.Truncate(value, m.cols[i].Width, "…")))
+		renderedCell := style.Render(runewidth.Truncate(value, m.cols[i].Width, "…"))
+
+		if r == m.cursor {
+			renderedCell = m.styles.Selected.Render(renderedCell)
+		} else {
+			renderedCell = m.styles.Cell.Render(renderedCell)
+		}
+
 		s = append(s, renderedCell)
 	}
 
-	row := lipgloss.JoinHorizontal(lipgloss.Top, s...)
-
-	if r == m.cursor {
-		return m.styles.Selected.Render(row)
-	}
-
-	return row
+	return lipgloss.JoinHorizontal(lipgloss.Top, s...)
 }
 
 func clamp(v, low, high int) int {
